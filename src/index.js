@@ -1,7 +1,6 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import express from "express";
-import { Chess } from "chess.js";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import { getGameOverState } from "./functions/game-over.js";
@@ -9,8 +8,8 @@ import { loadGame } from "./functions/load-game.js";
 
 const app = express();
 const server = createServer(app);
-const PORT = process.env.PORT;
-const DBNAME = process.env.DBNAME;
+const PORT = 5000;
+const DBNAME = "games";
 
 // open the database file
 const db = await open({
@@ -46,7 +45,7 @@ const game = current_game;
 // Create a socket server to connect to.
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS
+    origin: "*"
   },
 });
 
