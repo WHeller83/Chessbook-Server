@@ -101,7 +101,8 @@ io.on("connection", (socket) => {
         gameState
       );
 
-      // Start a new game and load it if the gamestate is not ''
+      // If the gamestate is set, it means the game has ended. 
+      // Save it into the database and start a new game.
       if (gameState) {
         db.run(
           "INSERT OR REPLACE INTO current_game(id, current_game_id) VALUES (1, ?);",
@@ -109,13 +110,18 @@ io.on("connection", (socket) => {
         );
         history = [];
         game.reset();
-        socket.emit("current_game", {
-          currentFen: game.fen(),
-          currentTurn: game.turn(),
-          history: history,
-          game_id: game_id
-        });
       }
+
+      // Game state has updated, send it to all connected sockets
+      var gameInfo = {
+        currentFen: game.fen(),
+        currentTurn: game.turn(),
+        history: history,
+        game_id: game_id
+      }
+      socket.emit("current_game", gameInfo);
+      socket.broadcast.emit("current_game", gameInfo);
+
     } catch (e) {
       console.log(e);
       return;
